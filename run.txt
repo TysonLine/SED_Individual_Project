@@ -1,0 +1,80 @@
+EnvCanViz Run Command Guide (Plain Text)
+
+This guide helps you build your own run commands for EnvCanViz.
+
+1) Choose the launcher
+- Multi-file package (envcanviz/ folder present):
+  python -m envcanviz ...
+- Single-file script (envcanviz.py):
+  python envcanviz.py ...
+
+Run from the project root (where the envcanviz/ folder or envcanviz.py lives).
+
+2) Inspect first (see headers & sample rows)
+  python -m envcanviz --input <CSV_PATH> --inspect
+OR (single file)
+  python envcanviz.py --input <CSV_PATH> --inspect
+
+3) Build your command in layers (template)
+
+Base:
+  python -m envcanviz --input <CSV_PATH> --datetime-col "<TIME_COLUMN>"
+OR
+  python envcanviz.py --input <CSV_PATH> --datetime-col "<TIME_COLUMN>"
+
+What to produce (pick one or more):
+  --timeseries        # line charts
+  --hist              # histograms
+  --summary           # prints and saves summary.csv
+  --export-clean      # saves cleaned or resampled data to CSV
+
+What to analyze (Y-axis):
+  --value-cols "Column A" "Column B"
+(Note: names must match exactly as shown by --inspect; use quotes around names with spaces/symbols.)
+
+Optional cleaning / filtering / tuning:
+  --start YYYY-MM-DD --end YYYY-MM-DD      # inclusive date window
+  --numeric-cols "Col1" "Col2"             # coerce additional columns to numeric
+  --trace-as-zero                          # treat literal "Trace" as 0.0 (precip)
+  --resample D|W|M|Q|A --agg mean|sum|min|max|median
+  --bins 0|N                               # 0 = auto bins for hist; N = fixed bin count
+  --outdir my_figures                      # output folder for PNG/CSV
+
+4) Examples to remix
+
+A) Simple monthly temps + precip (charts + summary)
+  python -m envcanviz --input data.csv     --datetime-col "Date/Time"     --value-cols "Mean Temp (°C)" "Total Precip (mm)"     --timeseries --hist --summary
+
+B) Focus a date window (e.g., 1979 only)
+  python -m envcanviz --input data.csv     --datetime-col "Date/Time"     --start 1979-01-01 --end 1979-12-31     --value-cols "Mean Temp (°C)"     --timeseries --summary
+
+C) Annual totals of precipitation
+  python -m envcanviz --input data.csv     --datetime-col "Date/Time"     --value-cols "Total Precip (mm)"     --resample A --agg sum     --timeseries --hist --summary --export-clean     --outdir figures_annual
+
+D) Daily stats for hourly data
+  python -m envcanviz --input hourly.csv     --datetime-col "Date/Time (Local)"     --value-cols "Temperature (°C)"     --resample D --agg mean     --timeseries --summary
+
+E) Histograms only, fixed bin count
+  python -m envcanviz --input data.csv     --datetime-col "Date/Time"     --value-cols "Total Precip (mm)"     --hist --bins 25
+
+F) Non-UTF-8 file (try different encoding)
+  python -m envcanviz --input data.csv     --encoding latin1     --datetime-col "Date/Time"     --value-cols "Mean Temp (°C)"     --summary
+
+(For the single-file version, replace 'python -m envcanviz' with 'python envcanviz.py'.)
+
+5) Decision checklist
+1. Which file?            --input <path>
+2. Time column?           (from --inspect) --datetime-col "<Exact Header>"
+3. What to produce?       --timeseries / --hist / --summary / --export-clean
+4. Which columns (Y)?     --value-cols "..." "..." (exact names)
+5. Filters/tweaks?        --start/--end, --trace-as-zero, --resample .. --agg .., --bins, --outdir
+
+6) Common fixes
+- Column not found:
+  Run --inspect and copy the exact header text.
+- Could not detect a datetime column:
+  Add --datetime-col "<Exact Header>".
+- Weird numbers or blank plots:
+  Add --numeric-cols for fields that were read as text; consider --trace-as-zero for precip.
+- Nothing produced:
+  Ensure you included at least one action flag (e.g., --timeseries).
