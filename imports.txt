@@ -1,0 +1,36 @@
+EnvCanViz — Imports & Install (Plain Text)
+
+Standard Library (bundled with Python):
+- argparse
+- sys
+- pathlib (Path)
+- typing (List, Dict, Iterable, Optional, Tuple)
+- re
+
+Third-Party (must be installed):
+- pandas
+- numpy
+- matplotlib (matplotlib.pyplot)
+
+Recommended install (one line):
+  pip install "pandas>=2.0" "numpy>=1.24" "matplotlib>=3.7"
+
+Optional: requirements.txt contents
+  pandas>=2.0
+  numpy>=1.24
+  matplotlib>=3.7
+
+Quick environment check (copy/paste):
+  python - << 'PY'
+  import argparse, sys, re
+  from pathlib import Path
+  from typing import List, Dict, Iterable, Optional, Tuple
+  import pandas as pd
+  import numpy as np
+  import matplotlib.pyplot as plt
+  print("All imports OK.")
+  PY
+
+Notes:
+- If you only run the minimal M1 script (CSV read + column getter), you only need the standard library.
+- For the full multi-file version (plots/resampling/summary), install the third-party packages above.
